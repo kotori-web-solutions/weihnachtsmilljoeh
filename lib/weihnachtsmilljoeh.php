@@ -8,10 +8,15 @@
  * PHP version 7.4.0
  *
  * @author     Maren Arnhold <info@kotori.de>
- * @version    1.0
+ * @version    1.1
  * @link       https://github.com/kotori-web-solutions/weihnachtsmilljoeh
  *
  * Requires php_gmp extension 
+ * 
+ * Usage/instantiation:
+ * 
+ * $wm = new Weihnachtsmilljoeh(int $lowerthreshold, int $upperthreshold)
+ * $wm->calculate();
  * 
  */
  
@@ -22,24 +27,84 @@ require("num2text.php");
 class Weihnachtsmilljoeh 
 {
 	
-	protected int $upperthreshold = 1;
+	// Upper threshold to explore
+	protected int $upperthreshold = 2;
+	
+	// Lower threshold from which to start
+	protected int $lowerthreshold = 1;
+	
+	// Current high score
 	protected int $highscore = 0;
 
 
-	public function __construct($n){
+	public function __construct($m,$n){
 		
+		if ($m > 0) { $this->lowerthreshold = $m; };
 		if ($n > 0) { $this->upperthreshold = $n; };
 		
 	}
 
-
-	function factorisePrime($n,$max,&$arr){
+	// Collect prime numbers up to int $max, stored in Array $arr. $n has to be 1 at first function call. 
+	function getPrimeNumbers($n,$max,&$arr){
 			
-		if ((int)gmp_nextprime($n) <= $max) { $arr[] = $this->factorisePrime((int)gmp_nextprime($n),$max,$arr)." "; };	
+		if ((int)gmp_nextprime($n) <= $max) { $arr[] = $this->getPrimeNumbers((int)gmp_nextprime($n),$max,$arr)." "; };	
 		
 		if ($n == 1) { $arr[] = 1; };
 		
 		return $n;
+	
+	}
+	
+
+	// As we will only accept integer values for division results:
+	// Get prime factors for $n and their multiples in order to reduce sensible brute force scope	
+	function getPrimeFactorsAndMultiples($n){
+		
+		$primearray = [$n];
+		$this->getPrimeNumbers(1,$n,$primearray);
+		$extended_primearray = [];
+	
+		$i=1;
+
+		$o = $n;
+
+		if ($primearray[0] == $primearray[1]) {
+			
+			$extended_primearray[] = 1;
+			$extended_primearray[] = $n;
+			
+		} else while(true){
+
+			if ($i == (count($primearray)-1)) { break; };
+						
+			
+			if ((($o/(int)$primearray[$i]) != floor($o/(int)$primearray[$i])) && ($o == $n)) { 
+				
+				$i++;
+				$j = $i;
+				
+			};
+			
+			if ((($o/(int)$primearray[$i]) != floor($o/(int)$primearray[$i])) && ($o != $n)) { 
+				
+				$i++;
+				
+			};			
+			
+			if (($o/(int)$primearray[$i]) == floor($o/(int)$primearray[$i])) { 
+			
+				$extended_primearray[] = $o/(int)$primearray[$i];
+				$o = $o/(int)$primearray[$i];
+				if ($o == 1) { $i = $j+1; $o = $n; };
+							
+			};
+									
+		}
+		
+		$extended_primearray[] = $n;
+		$extended_primearray = array_unique(array_map('intval',$extended_primearray));
+		
+		return $extended_primearray;		
 	
 	}
 	
@@ -93,11 +158,10 @@ class Weihnachtsmilljoeh
 	
 	function calculateDivision($n){
 		
-		$primearray = [$n];
-		$this->factorisePrime(1,$n,$primearray);
-		$primearray = array_unique(array_map('intval',$primearray));
+		
+		$extended_primearray = $this->getPrimeFactorsAndMultiples($n);		
 			
-		foreach ($primearray as $pa){
+		foreach ($extended_primearray as $pa){
 			
 			$op_string = num2text($n)."geteiltdurch".num2text((int)$pa);		
 			$op_string_numeric = $n." / ".(int)$pa;		
@@ -131,13 +195,28 @@ class Weihnachtsmilljoeh
 
 	public function calculate(){
 		
-		for ($i=1;$i<=$this->upperthreshold;$i++){
+		for ($i=$this->lowerthreshold;$i<=$this->upperthreshold;$i++){
 			
-			$this->calculateAddition($i);			
+			// For larger values of $i, addition and multiplication are negligible as operation 
+			// string length in the German language will never be sufficient to match the result.
+			// Also, division will not yield large scores in comparison to subtraction, 
+			// so we will ignore it as well.
+			
+			if ($i < 100) {
+				
+				$this->calculateAddition($i);											
+				$this->calculateMultiplication($i);
+				
+			}
+			
+			if ($i < 1000) {
+			
+				$this->calculateDivision($i);	
+				
+			}
+			
 			$this->calculateSubtraction($i);
-			$this->calculateDivision($i);
-			$this->calculateMultiplication($i);
-						
+									
 		};
 		
 	}

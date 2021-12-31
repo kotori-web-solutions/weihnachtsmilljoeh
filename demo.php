@@ -7,7 +7,7 @@ ini_set("max_execution_time", -1);
 require("./lib/weihnachtsmilljoeh.php");
 use Kotori\Weihnachtsmilljoeh as WM;
 
-$wm = new WM(50000);
+$wm = new WM(1,2500);
 $wm->calculate();
 
 ?>
