@@ -128,7 +128,7 @@ class Weihnachtsmilljoeh
 
 	function calculateAddition($n){
 
-		for ($j=1;$j<=$n;$j++){
+		for ($j=(max(1,($n-10000)));$j<$n;$j++){
 
 			$op_string = num2text((int)$n)."plus".num2text((int)$j);			
 			$op_string_numeric = $n." + ".$j;			
@@ -142,8 +142,8 @@ class Weihnachtsmilljoeh
 	
 	
 	function calculateSubtraction($n){
-		
-		for ($j=1;$j<$n;$j++){
+				
+		for ($j=(max(1,($n-10000)));$j<$n;$j++){
 
 			$op_string = num2text($n)."minus".num2text($j);
 			$op_string_numeric = $n." - ".$j;
@@ -180,7 +180,7 @@ class Weihnachtsmilljoeh
 	
 	function calculateMultiplication($n){
 				
-		for ($j=1;$j<=$n;$j++){
+		for ($j=(max(1,($n-10000)));$j<$n;$j++){
 
 			$op_string = num2text($n)."mal".num2text($j);
 			$op_string_numeric = $n." * ".$j;
