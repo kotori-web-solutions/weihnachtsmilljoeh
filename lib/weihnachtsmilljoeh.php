@@ -9,7 +9,7 @@
  *
  * @author     Maren Arnhold <info@kotori.de>
  * @version    1.0
- * @link       https://github.com/kotori-web-solutions/
+ * @link       https://github.com/kotori-web-solutions/weihnachtsmilljoeh
  *
  * Requires php_gmp extension 
  * 
