@@ -34,7 +34,7 @@ class Weihnachtsmilljoeh
 	protected int $lowerthreshold = 1;
 	
 	// Current high score
-	protected int $highscore = 0;
+	protected string $highscore = "0";
 
 
 	public function __construct($m,$n){
@@ -111,17 +111,18 @@ class Weihnachtsmilljoeh
 
 	function outputFormatted($os, $osn, $or, $opa, $opb){
 		
-		$points = ($opa+$opb);
+		$gmp_opa = gmp_init($opa);
+		$gmp_opb = gmp_init($opb);		
+		$highscore = gmp_init($this->highscore);
+
+		if (gmp_cmp($highscore,($gmp_opa+$gmp_opb)) == -1) { 
 		
-		if ($this->highscore < ($opa+$opb)) { 
-		
-			$this->highscore = ($opa+$opb); 
-			$points = "***".($opa+$opb).", neuer Highscore.***";
+			$this->highscore = gmp_strval($gmp_opa+$gmp_opb);
+			$points = "***".gmp_strval($gmp_opa+$gmp_opb).", neuer Highscore.***";
+			echo $osn." = ".$or." ____ ".$os." (".mb_strlen($os)." Buchstaben). ____ Punktwert: ".$points."\r\n";
 			
 		};
-		
-		echo $osn." = ".$or." ____ ".$os." (".mb_strlen($os)." Buchstaben). ____ Punktwert: ".$points."\r\n";
-		
+	
 		
 	}
 	
